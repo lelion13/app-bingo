@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Visor Bingo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/png" href="/static/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+  }
+  html, body {
+    height: 100%;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(160deg, #667eea 0%, #764ba2 55%, #5b21b6 100%);
+    min-height: 100dvh;
+  }
+  .visor-shell {
+    min-height: 100dvh;
+    padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+  }
+  .ultima-numero {
+    font-size: clamp(5rem, 28vw, 10rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: #fff;
+    text-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  }
+  .ultima-vacia {
+    font-size: clamp(1.1rem, 4.5vw, 1.5rem);
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .bolilla {
+    width: clamp(2.6rem, 12vw, 3.4rem);
+    height: clamp(2.6rem, 12vw, 3.4rem);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #fff;
+    font-size: clamp(0.95rem, 3.8vw, 1.15rem);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), inset 0 -3px 6px rgba(0, 0, 0, 0.2);
+  }
+  .bolilla.is-latest {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+    transform: scale(1.08);
+  }
+  .panel {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-radius: 1.5rem;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
+  }
+</style>
+</head>
+<body>
+  <div class="visor-shell flex flex-col gap-4 max-w-3xl mx-auto">
+    <header class="flex items-center justify-between gap-3 text-white">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-wide opacity-80">Bingo 90</p>
+        <h1 class="text-2xl font-extrabold leading-tight">Visor</h1>
+      </div>
+      <div class="text-right">
+        <p id="contador" class="text-sm font-bold bg-white/20 rounded-xl px-3 py-2">Restantes: —</p>
+      </div>
+    </header>
+
+    <section class="panel px-4 py-8 text-center">
+      <p class="text-slate-500 font-semibold text-sm mb-2">Última bolilla</p>
+      <div id="ultima" class="ultima-vacia">Esperando sorteo…</div>
+    </section>
+
+    <section class="panel p-4 flex-1">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-extrabold text-slate-800">Salidas</h2>
+        <span id="totalSalidas" class="text-sm font-semibold text-slate-500">0</span>
+      </div>
+      <div id="salidas" class="flex flex-wrap gap-2 justify-center content-start min-h-[8rem]"></div>
+    </section>
+
+    <p class="text-center text-white/70 text-xs pb-2">Solo lectura · se actualiza solo</p>
+  </div>
+
+  <script src="/static/js/visor.js?v=1"></script>
+</body>
+</html>

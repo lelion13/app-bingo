@@ -1,16 +1,31 @@
+import os
+import random
+
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import random
-from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+APP_ENV = os.getenv("APP_ENV", "development").lower()
+IS_PRODUCTION = APP_ENV in ("production", "prod")
 
-# 🚀 Configurar CORS
+_cors_raw = os.getenv("CORS_ORIGINS", "*").strip()
+CORS_ORIGINS = (
+    ["*"]
+    if _cors_raw == "*"
+    else [origin.strip() for origin in _cors_raw.split(",") if origin.strip()]
+)
+
+app = FastAPI(
+    docs_url=None if IS_PRODUCTION else "/docs",
+    redoc_url=None if IS_PRODUCTION else "/redoc",
+    openapi_url=None if IS_PRODUCTION else "/openapi.json",
+)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,10 +40,31 @@ bolillas_disponibles = list(range(1, 91))  # Bingo de 90 números
 random.shuffle(bolillas_disponibles)
 bolillas_salidas = []
 
+@app.get("/health")
+async def health():
+    return JSONResponse({"status": "ok"})
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse(
         "index.html",
+        {"request": request}
+    )
+
+@app.get("/configuracion", response_class=HTMLResponse)
+@app.get("/configuracion/", response_class=HTMLResponse)
+async def configuracion(request: Request):
+    return templates.TemplateResponse(
+        "configuracion.html",
+        {"request": request}
+    )
+
+@app.get("/visor", response_class=HTMLResponse)
+@app.get("/visor/", response_class=HTMLResponse)
+async def visor(request: Request):
+    """Pantalla solo-lectura para celular/tablet con números salidos."""
+    return templates.TemplateResponse(
+        "visor.html",
         {"request": request}
     )
 

@@ -1,0 +1,37 @@
+# Producción: imagen GHCR + Traefik (Docker provider / traefik-wpez en host).
+#
+# En el VPS:
+#   mkdir -p /docker/app-bingo && cd /docker/app-bingo
+#   # copiar este compose + .env.prod
+#   echo IMAGE_TAG=<sha-o-latest> >> .env.prod
+#   docker compose --env-file .env.prod -f docker-compose.prod.yml pull
+#   docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
+
+name: app-bingo
+
+services:
+  bingo:
+    image: ghcr.io/lelion13/app-bingo:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://bingo.lionapp.cloud}
+    expose:
+      - "8000"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8000/health || exit 1"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.app-bingo.rule=Host(`bingo.lionapp.cloud`)
+      - traefik.http.routers.app-bingo.entrypoints=websecure
+      - traefik.http.routers.app-bingo.tls=true
+      - traefik.http.routers.app-bingo.tls.certresolver=letsencrypt
+      - traefik.http.services.app-bingo.loadbalancer.server.port=8000

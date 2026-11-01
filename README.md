@@ -108,4 +108,12 @@ uvicorn main:app --reload
 
 ---
 
+## ☁️ Producción (GHCR + Traefik)
+
+- Dominio: `https://bingo.lionapp.cloud`
+- Repo: `https://github.com/lelion13/app-bingo`
+- Imagen: `ghcr.io/lelion13/app-bingo`
+- Compose: `docker-compose.prod.yml`
+- Guía VPS: [`docs/deploy-vps.md`](docs/deploy-vps.md)
+
 Desarrollado con ❤️

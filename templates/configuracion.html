@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuración — Bingo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/png" href="/static/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.4s ease-in-out; }
+.btn-guardar {
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.25);
+}
+.btn-volver {
+  background: linear-gradient(to right, #f093fb, #f5576c);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.25);
+}
+.field {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+.field:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #22d3ee;
+}
+</style>
+</head>
+<body class="flex items-center justify-center py-10 px-4">
+
+<main class="bg-white/90 backdrop-blur-md shadow-2xl rounded-3xl p-8 w-full max-w-lg fade-in">
+  <h1 class="text-4xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-teal-400 text-center">
+    Configuración
+  </h1>
+  <p class="text-slate-600 text-center mb-8 text-sm">
+    Solo para esta sesión del navegador. Al cerrarlo vuelven los valores por defecto.
+  </p>
+
+  <label for="modalSegundos" class="block text-left text-slate-800 font-bold mb-2">
+    Tiempo del modal con el número
+  </label>
+  <div class="flex items-center gap-3 mb-2">
+    <input id="modalSegundos" type="number" min="1" max="30" step="1" class="field" />
+    <span class="text-slate-600 font-semibold whitespace-nowrap">segundos</span>
+  </div>
+  <p class="text-slate-500 text-sm mb-6 text-left">Entre 1 y 30. Por defecto: 3.</p>
+
+  <label for="modalTamanoCm" class="block text-left text-slate-800 font-bold mb-2">
+    Tamaño del modal circular (diámetro)
+  </label>
+  <div class="flex items-center gap-3 mb-2">
+    <input id="modalTamanoCm" type="number" min="3" max="20" step="0.5" class="field" />
+    <span class="text-slate-600 font-semibold whitespace-nowrap">cm</span>
+  </div>
+  <p class="text-slate-500 text-sm mb-6 text-left">
+    Entre 3 y 20 cm. El número se escala en proporción al círculo. Por defecto: 8 cm.
+  </p>
+
+  <p id="mensajeGuardado" class="hidden mb-4 text-center text-sm font-semibold text-emerald-600">
+    Guardado para esta sesión.
+  </p>
+
+  <div class="flex flex-col sm:flex-row gap-3">
+    <button id="guardarBtn" type="button" class="btn-guardar text-white px-4 py-3 rounded-2xl font-bold flex-1">
+      Guardar
+    </button>
+    <a href="/" class="btn-volver text-white px-4 py-3 rounded-2xl font-bold text-center flex-1 no-underline">
+      Volver al bingo
+    </a>
+  </div>
+</main>
+
+<script src="/static/js/config-store.js?v=3"></script>
+<script src="/static/js/configuracion.js?v=3"></script>
+</body>
+</html>

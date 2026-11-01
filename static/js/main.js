@@ -1,5 +1,6 @@
 // Referencias DOM
-const numeroBolilla = document.getElementById("numeroBolilla");
+const numeroModal = document.getElementById("numeroModal");
+const numeroModalValor = document.getElementById("numeroModalValor");
 const sacarBtn = document.getElementById("sacarBtn");
 const iniciarBtn = document.getElementById("iniciarBtn");
 const resultado = document.getElementById("resultado");
@@ -12,6 +13,26 @@ const todasBolillas = document.getElementById("todasBolillas");
 
 let bolillasSalidas = [];
 let bolillasRestantes = 90;
+let modalTimeoutId = null;
+
+function mostrarNumeroModal(numero) {
+  if (modalTimeoutId) clearTimeout(modalTimeoutId);
+  aplicarTamanoModal(numeroModal, numeroModalValor);
+  numeroModalValor.textContent = String(numero);
+  numeroModal.classList.add("is-open");
+  numeroModal.setAttribute("aria-hidden", "false");
+  modalTimeoutId = setTimeout(() => {
+    ocultarNumeroModal();
+  }, getModalDuracionMs());
+}
+
+function ocultarNumeroModal() {
+  if (modalTimeoutId) clearTimeout(modalTimeoutId);
+  modalTimeoutId = null;
+  numeroModal.classList.remove("is-open");
+  numeroModal.setAttribute("aria-hidden", "true");
+  numeroModalValor.textContent = "";
+}
 
 // ========== CONFIGURACIÓN THREE.JS ==========
 const canvas = document.getElementById('bolillaCanvas');
@@ -23,9 +44,16 @@ const renderer = new THREE.WebGLRenderer({
   alpha: true
 });
 
-renderer.setSize(300, 300);
 renderer.setClearColor(0x000000, 0);
 camera.position.z = 5;
+
+function sincronizarTamanoCanvas() {
+  const size = Math.max(1, Math.round(container.clientWidth || 300));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(size, size, false);
+  camera.aspect = 1;
+  camera.updateProjectionMatrix();
+}
 
 // Crear esfera 3D
 const geometry = new THREE.SphereGeometry(1.5, 32, 32);
@@ -104,6 +132,12 @@ animate();
 
 // Interacción hover
 const container = document.getElementById('canvasContainer');
+sincronizarTamanoCanvas();
+window.addEventListener('resize', sincronizarTamanoCanvas);
+if (window.ResizeObserver) {
+  new ResizeObserver(sincronizarTamanoCanvas).observe(container);
+}
+
 container.addEventListener('mouseenter', () => {
   if (!isSpinning) {
     sphere.scale.set(1.1, 1.1, 1.1);
@@ -153,10 +187,11 @@ function agregarBolillaVisual(numero) {
   bolillaDiv.style.background = `radial-gradient(circle at 30% 30%, #fff, ${color}, ${color})`;
   bolillaDiv.innerHTML = `<div>${numero}</div>`;
 
+  // Las más recientes quedan arriba
   ultimasBolillas.insertBefore(bolillaDiv, ultimasBolillas.firstChild);
 
   const bolillas = ultimasBolillas.querySelectorAll('.bolilla-pequena');
-  if (bolillas.length > 10) {
+  if (bolillas.length > 30) {
     bolillas[bolillas.length - 1].remove();
   }
 }
@@ -192,7 +227,7 @@ iniciarBtn.addEventListener("click", async () => {
       mostrarToast('exito', data.mensaje);
       bolillasSalidas = [];
       bolillasRestantes = data.total;
-      numeroBolilla.textContent = "";
+      ocultarNumeroModal();
       ultimasBolillas.innerHTML = "";
       resultado.classList.add("hidden");
       // cambiarColorEsfera('#4dabf7');
@@ -230,18 +265,14 @@ sacarBtn.addEventListener("click", async () => {
 
   // --- INICIO DE CAMBIOS ---
 
-  // 1. Ocultamos el número de la esfera
-  numeroBolilla.textContent = ""; 
+  ocultarNumeroModal();
 
-  // 2. Mostramos el (la caja de abajo)
-  resultado.classList.remove("hidden"); 
+  // Flipper de números aleatorios en la caja de abajo
+  resultado.classList.remove("hidden");
 
   const intervalId = setInterval(() => {
-    // 3. El flipper de números aleatorios ahora ocurre en 'resultado'
-    resultado.textContent = Math.floor(Math.random() * 90) + 1; 
+    resultado.textContent = Math.floor(Math.random() * 90) + 1;
   }, 100);
-  
-  // --- FIN DE CAMBIOS ---
 
   setTimeout(async () => {
     clearInterval(intervalId);
@@ -256,19 +287,10 @@ sacarBtn.addEventListener("click", async () => {
       const data = await res.json();
 
       if (data.bolilla) {
-        // const aplausos = new Audio("/static/sounds/cheers_crowd.mp3");
-        // aplausos.volume = 0.6;
-        // aplausos.play().catch(() => {});
+        mostrarNumeroModal(data.bolilla);
 
-        // 4. Al final, mostramos el número final en AMBOS lugares
-//         numeroBolilla.textContent = data.bolilla; // En la esfera
-        resultado.textContent = data.bolilla; 	// En la caja
-
-        const color = getColorBolilla(data.bolilla);
-        // cambiarColorEsfera(color);
-
-        // Esta línea ya no es tan necesaria porque lo hicimos antes, pero no hace daño
-        resultado.classList.remove("hidden"); 
+        resultado.textContent = data.bolilla;
+        resultado.classList.remove("hidden");
 
         agregarBolillaVisual(data.bolilla);
 
@@ -291,7 +313,6 @@ sacarBtn.addEventListener("click", async () => {
         }
       } else if (data.error) {
         mostrarToast('error', data.mensaje || data.error);
-end;
       }
     } catch (err) {
       mostrarToast('error', '❌ Error al sacar la bolilla.');
@@ -331,5 +352,30 @@ popup.addEventListener("click", (e) => {
   if (e.target === popup) popup.classList.add("hidden");
 });
 
-// Estado inicial
-actualizarContador();
+async function restaurarEstadoDesdeServidor() {
+  try {
+    const res = await fetch("/estado/");
+    const data = await res.json();
+    bolillasSalidas = Array.isArray(data.salidas) ? data.salidas : [];
+    bolillasRestantes = typeof data.restantes === "number" ? data.restantes : 90;
+
+    ultimasBolillas.innerHTML = "";
+    bolillasSalidas.slice(-30).forEach((numero) => agregarBolillaVisual(numero));
+
+    if (bolillasSalidas.length > 0) {
+      const ultima = bolillasSalidas[bolillasSalidas.length - 1];
+      resultado.textContent = ultima;
+      resultado.classList.remove("hidden");
+    } else {
+      resultado.classList.add("hidden");
+      resultado.textContent = "";
+    }
+
+    actualizarContador();
+  } catch (err) {
+    actualizarContador();
+  }
+}
+
+aplicarTamanoModal(numeroModal, numeroModalValor);
+restaurarEstadoDesdeServidor();

@@ -1,0 +1,40 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Tech stack: FastAPI + Uvicorn + Jinja2 (Python 3.11); frontend vanilla JS + Three.js + Tailwind CDN + Bootstrap 5; Docker (python:3.11-slim).
+  Architecture: Monolith — main.py in-memory bingo (90); templates/index.html + configuracion.html; static/js/main.js, config-store.js, configuracion.js. No DB, no auth.
+  APIs: GET /, GET /configuracion, GET /iniciar_bingo/, GET /sacar_bolilla/, GET /estado/; CORS allow_origins=* .
+  Client config: sessionStorage only (modal seconds + modal diameter cm); defaults on new browser session.
+  UI: responsive 3-col desktop (logo||BINGO||últimas); number reveal = circular modal over ball; restore from /estado/ on home load.
+  Testing: none; verify manually + Docker HEALTHCHECK on /.
+  Style: Spanish UI; server-authoritative draws; scoped changes.
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Identify affected modules (main.py, templates/, static/js/, Dockerfile)
+    - Note impact on in-memory state (resets on restart / multi-worker unsafe)
+  specs:
+    - Use Given/When/Then format for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for draw/reset/config flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group tasks by phase (infrastructure, implementation, testing)
+    - Use hierarchical numbering (1.1, 1.2, etc.)
+    - Keep tasks small enough to complete in one session
+  apply:
+    - Follow existing code patterns and conventions
+    - Load relevant coding skills for the project stack
+    tdd: false
+    test_command: ""
+  verify:
+    - Run tests if test infrastructure exists
+    - Compare implementation against every spec scenario
+    test_command: ""
+    build_command: "docker build -t bingo-app ."
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas (large removals)
