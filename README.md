@@ -80,16 +80,23 @@ source venv/bin/activate   # En Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-**3. Ejecutar el servidor:**
+**3. Primer admin (una vez):**
+```bash
+python scripts/bootstrap_admin.py --username admin --password 'TU_CLAVE'
+```
+
+**4. Ejecutar el servidor:**
 ```bash
 uvicorn main:app --reload
 ```
+
+Abrí `/login`, ingresá, y usá el QR hacia `https://bingo.lionapp.cloud/visor/<usuario>`.
 
 ---
 
 ## 🔧 Tecnologías Utilizadas
 
-- **Backend:** Python, FastAPI, Jinja2 Templates  
+- **Backend:** Python, FastAPI, Jinja2, SQLite, JWT + bcrypt  
 - **Frontend:** HTML5, JavaScript (ES6+)  
 - **Gráficos 3D:** Three.js  
 - **Estilos:** Tailwind CSS (vía CDN), Bootstrap 5 (para Toasts y Modales)  
@@ -99,12 +106,15 @@ uvicorn main:app --reload
 
 ## 📄 API Endpoints
 
-| Método | Endpoint            | Descripción |
-|---------|---------------------|--------------|
-| `GET`   | `/`                 | Renderiza la interfaz del juego |
-| `GET`   | `/iniciar_bingo/`   | Reinicia el juego y mezcla las bolillas |
-| `GET`   | `/sacar_bolilla/`   | Extrae una bolilla aleatoria y actualiza el estado |
-| `GET`   | `/estado/`          | Devuelve el JSON con las bolillas restantes y las que salieron |
+| Método | Endpoint | Auth | Descripción |
+|---------|----------|------|-------------|
+| `POST` | `/auth/login` | — | JWT de acceso |
+| `GET` | `/iniciar_bingo/` | JWT | Reinicia el bingo del usuario |
+| `GET` | `/sacar_bolilla/` | JWT | Saca bolilla del usuario |
+| `GET` | `/estado/` | JWT | Estado del bingo propio |
+| `GET` | `/estado/{username}` | público | Estado para el visor |
+| `GET/PUT` | `/api/config/` | JWT | Modal segundos/cm |
+| `*` | `/api/users/` | JWT admin | ABM usuarios |
 
 ---
 

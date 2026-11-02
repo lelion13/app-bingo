@@ -58,17 +58,39 @@ The “Últimas” panel MUST list drawn balls with the most recent at the top. 
 
 ### Requirement: Spanish primary chrome
 
-Primary user-visible labels and toasts on the home flow SHOULD remain in Spanish (Iniciar Bingo, Sacar Bolilla, Ver Bolillas, Configuración, Visor, Últimas, etc.).
+Primary user-visible labels and toasts on the home flow SHOULD remain in Spanish (Iniciar Bingo, Sacar Bolilla, Ver Bolillas, Configuración, Últimas, Visor móvil, etc.).
 
 ### Requirement: Home discovers viewer
 
-The home controls MUST include a link to `/visor` so operators can open or share the mobile viewer URL.
+The home page MUST discover the viewer via a production QR and friendly link in the left control column (below the primary action buttons). A separate **Visor** button control MUST NOT be shown.
 
-#### Scenario: Visor link present
+#### Scenario: No Visor button
 
 - GIVEN the home page is loaded
-- WHEN the operator looks at the control column
-- THEN a navigation control to `/visor` MUST be available
+- WHEN the operator inspects the left controls
+- THEN there MUST NOT be a standalone “Visor” button
+- AND the QR + friendly link block MUST be present below the remaining actions
+
+### Requirement: Production visor QR on home
+
+The home page MUST display a QR code in the left control column, below the primary action buttons. The QR MUST encode exactly `https://bingo.lionapp.cloud/visor`. The rendered QR SHOULD be approximately 120px wide (small).
+
+#### Scenario: Scan opens production visor
+
+- GIVEN the home page is loaded (any host)
+- WHEN a device scans the displayed QR
+- THEN it MUST open `https://bingo.lionapp.cloud/visor`
+- AND MUST NOT encode the current page origin instead of production
+
+### Requirement: Friendly visor link on home
+
+Adjacent to the QR (same left-column block), the home page MUST show a clickable link whose visible text is `bingo.lionapp.cloud/visor` and whose `href` is `https://bingo.lionapp.cloud/visor`.
+
+#### Scenario: Tap friendly link
+
+- GIVEN the home page is loaded
+- WHEN the user activates the friendly link
+- THEN the browser MUST navigate to `https://bingo.lionapp.cloud/visor`
 
 ### Requirement: Mobile viewer page
 

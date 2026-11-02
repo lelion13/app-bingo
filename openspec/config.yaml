@@ -3,19 +3,19 @@ schema: spec-driven
 
 context: |
   Tech stack: FastAPI + Uvicorn + Jinja2 (Python 3.11); vanilla JS + Three.js + Tailwind CDN + Bootstrap 5.
-  Architecture: Monolith main.py (in-memory bingo 90); templates index/configuracion/visor; static/js main, config-store, configuracion, visor. No DB, no auth.
-  APIs: GET /, /configuracion, /visor, /health, /iniciar_bingo/, /sacar_bolilla/, /estado/; static under /static.
-  Jinja: Starlette TemplateResponse(request, "name.html") — never (name, {request: ...}).
-  Client config: sessionStorage modal seconds (default 3) + diameter cm (default 8, number 55%).
-  UI: responsive 3-col (logo||BINGO||últimas); circular modal on ball; /visor read-only poll /estado/ ~1.5s.
-  Deploy: domain bingo.lionapp.cloud; image ghcr.io/lelion13/app-bingo; compose docker-compose.prod.yml + Traefik traefik-wpez (websecure/letsencrypt); VPS /docker/app-bingo; APP_ENV=production disables /docs.
-  Testing: manual; compose healthcheck GET /health every 60s.
+  Architecture: Multi-user bingo — SQLite (`DATABASE_PATH`), JWT+bcrypt, roles admin|operador, 1 bingo/user.
+  Package: `app/` (db, security, deps, repositories, api); `main.py` wires routers + Jinja pages; `scripts/bootstrap_admin.py`.
+  Auth: POST /auth/login → JWT; panel APIs need Bearer; public GET /visor/{user} + /estado/{user}; bare /visor → 404.
+  Game: JWT /iniciar_bingo/, /sacar_bolilla/, /estado/; config JWT GET/PUT /api/config/; admin /api/users.
+  UI: /login, /, /configuracion, /usuarios (admin); QR → https://bingo.lionapp.cloud/visor/{username}.
+  Jinja: TemplateResponse(request, "name.html") only.
+  Deploy: bingo.lionapp.cloud; ghcr.io/lelion13/app-bingo; Traefik; volume bingo-data; JWT_SECRET required.
+  Testing: pytest (auth, isolation, config); healthcheck /health 60s.
 
 rules:
   proposal:
     - Include rollback plan for risky changes
-    - Identify affected modules (main.py, templates/, static/js/, Dockerfile, compose, workflows)
-    - Note impact on in-memory state (resets on restart / multi-worker unsafe)
+    - Identify affected modules (main.py, app/, templates/, static/js/, Dockerfile, compose, workflows)
   specs:
     - Use Given/When/Then format for scenarios
     - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
@@ -30,12 +30,12 @@ rules:
     - Follow existing code patterns and conventions
     - Load relevant coding skills for the project stack
     tdd: false
-    test_command: ""
+    test_command: "python -m pytest -q"
   verify:
     - Run tests if test infrastructure exists
     - Compare implementation against every spec scenario
     - After deploy: curl /health 200 and /docs 404 in production
-    test_command: ""
+    test_command: "python -m pytest -q"
     build_command: "docker build -t bingo-app ."
     coverage_threshold: 0
   archive:

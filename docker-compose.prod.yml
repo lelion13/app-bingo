@@ -16,6 +16,10 @@ services:
     environment:
       APP_ENV: ${APP_ENV:-production}
       CORS_ORIGINS: ${CORS_ORIGINS:-https://bingo.lionapp.cloud}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env.prod}
+      DATABASE_PATH: ${DATABASE_PATH:-/data/bingo.db}
+    volumes:
+      - bingo-data:/data
     expose:
       - "8000"
     security_opt:
@@ -35,3 +39,6 @@ services:
       - traefik.http.routers.app-bingo.tls=true
       - traefik.http.routers.app-bingo.tls.certresolver=letsencrypt
       - traefik.http.services.app-bingo.loadbalancer.server.port=8000
+
+volumes:
+  bingo-data:

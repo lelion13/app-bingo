@@ -1,3 +1,7 @@
+if (!requireAuthPage()) {
+  /* redirecting */
+}
+
 // Referencias DOM
 const numeroModal = document.getElementById("numeroModal");
 const numeroModalValor = document.getElementById("numeroModalValor");
@@ -10,6 +14,23 @@ const verBolillasBtn = document.getElementById("verBolillasBtn");
 const popup = document.getElementById("popupBolillas");
 const cerrarBtn = document.getElementById("cerrarPopup");
 const todasBolillas = document.getElementById("todasBolillas");
+const logoutBtn = document.getElementById("logoutBtn");
+const usuariosNav = document.getElementById("usuariosNav");
+const sessionUser = document.getElementById("sessionUser");
+
+const authUser = getAuthUser();
+if (sessionUser && authUser) {
+  sessionUser.textContent = `${authUser.username} · ${authUser.role}`;
+}
+if (usuariosNav && authUser && authUser.role === "admin") {
+  usuariosNav.classList.remove("hidden");
+}
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => logout());
+}
+if (authUser && authUser.username) {
+  initVisorQr(authUser.username);
+}
 
 let bolillasSalidas = [];
 let bolillasRestantes = 90;
@@ -220,7 +241,7 @@ iniciarBtn.addEventListener("click", async () => {
   iniciarBtn.disabled = true;
 
   try {
-    const res = await fetch("/iniciar_bingo/");
+    const res = await authFetch("/iniciar_bingo/");
     const data = await res.json();
 
     if (data.mensaje) {
@@ -283,7 +304,7 @@ sacarBtn.addEventListener("click", async () => {
     spinSpeed = 0;
 
     try {
-      const res = await fetch("/sacar_bolilla/");
+      const res = await authFetch("/sacar_bolilla/");
       const data = await res.json();
 
       if (data.bolilla) {
@@ -354,7 +375,7 @@ popup.addEventListener("click", (e) => {
 
 async function restaurarEstadoDesdeServidor() {
   try {
-    const res = await fetch("/estado/");
+    const res = await authFetch("/estado/");
     const data = await res.json();
     bolillasSalidas = Array.isArray(data.salidas) ? data.salidas : [];
     bolillasRestantes = typeof data.restantes === "number" ? data.restantes : 90;
@@ -377,5 +398,14 @@ async function restaurarEstadoDesdeServidor() {
   }
 }
 
-aplicarTamanoModal(numeroModal, numeroModalValor);
-restaurarEstadoDesdeServidor();
+async function bootHome() {
+  try {
+    await loadConfigFromServer();
+  } catch (_) {
+    /* defaults */
+  }
+  aplicarTamanoModal(numeroModal, numeroModalValor);
+  await restaurarEstadoDesdeServidor();
+}
+
+bootHome();

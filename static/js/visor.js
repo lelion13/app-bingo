@@ -5,6 +5,7 @@ const totalSalidasEl = document.getElementById("totalSalidas");
 
 const POLL_MS = 1500;
 let lastSignature = "";
+const visorUsername = String(window.VISOR_USERNAME || "").trim().toLowerCase();
 
 function getColorBolilla(numero) {
   if (numero >= 1 && numero <= 10) return "#ff6b6b";
@@ -41,7 +42,6 @@ function renderEstado(data) {
   ultimaEl.textContent = String(ultima);
   ultimaEl.style.color = getColorBolilla(ultima);
 
-  // Más recientes primero
   const orden = [...salidas].reverse();
   salidasEl.innerHTML = "";
   orden.forEach((numero, index) => {
@@ -55,13 +55,14 @@ function renderEstado(data) {
 }
 
 async function pollEstado() {
+  if (!visorUsername) return;
   try {
-    const res = await fetch("/estado/");
+    const res = await fetch(`/estado/${encodeURIComponent(visorUsername)}`);
     if (!res.ok) return;
     const data = await res.json();
     renderEstado(data);
   } catch (_) {
-    // silencioso: reintenta en el próximo tick
+    // silencioso
   }
 }
 

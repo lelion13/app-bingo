@@ -10,12 +10,16 @@ WORKDIR /app
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/* \
-    && useradd --create-home --uid 10001 --shell /usr/sbin/nologin appuser
+    && useradd --create-home --uid 10001 --shell /usr/sbin/nologin appuser \
+    && mkdir -p /data \
+    && chown appuser:appuser /data
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY --chown=appuser:appuser . .
+
+ENV DATABASE_PATH=/data/bingo.db
 
 USER appuser
 
