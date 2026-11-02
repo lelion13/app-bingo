@@ -207,6 +207,55 @@ body {
   font-size: clamp(1.15rem, 2.5vw, 1.5rem);
   flex-shrink: 0;
 }
+
+.visor-share {
+  margin-top: 0.35rem;
+  padding: 0.65rem 0.5rem;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.04));
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.visor-share__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4338ca;
+}
+
+.visor-share__qr {
+  width: 120px;
+  height: 120px;
+  background: #fff;
+  border-radius: 0.65rem;
+  padding: 4px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.visor-share__qr img,
+.visor-share__qr canvas {
+  display: block;
+  width: 112px !important;
+  height: 112px !important;
+}
+
+.visor-share__link {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #3730a3;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+  line-height: 1.25;
+}
 </style>
 </head>
 <body class="min-h-[100dvh] flex items-center justify-center py-2 px-2 sm:py-4">
@@ -236,9 +285,17 @@ body {
       ⚙️ <span>Configuración</span>
     </a>
 
-    <a href="/visor" class="bingo-btn bg-indigo-600/95 hover:bg-indigo-700">
-      📱 <span>Visor</span>
-    </a>
+    <div class="visor-share" aria-label="Abrir visor en otro dispositivo">
+      <p class="visor-share__label">Visor móvil</p>
+      <div id="visorQr" class="visor-share__qr" role="img" aria-label="Código QR al visor de producción"></div>
+      <a
+        id="visorLink"
+        class="visor-share__link"
+        href="https://bingo.lionapp.cloud/visor"
+        target="_blank"
+        rel="noopener noreferrer"
+      >bingo.lionapp.cloud/visor</a>
+    </div>
   </div>
 
   <!-- Columna central -->
@@ -285,7 +342,9 @@ body {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="/static/js/config-store.js?v=3"></script>
+<script src="/static/js/visor-qr.js?v=1"></script>
 <script src="/static/js/main.js?v=11"></script>
 </body>
 </html>

@@ -1,20 +1,15 @@
 # Archive report: ui-modal-config-responsive
 
-- **Archived**: 2026-11-01
-- **Mode**: hybrid (filesystem main specs + Engram project context refresh)
-- **Note**: Work was applied before formal propose→spec→design pipeline; this archive captures lineage and points at the resulting source-of-truth specs.
+- **Archived**: 2026-11-01 (retroactive; refreshed 2026-11-01 with full chat sync)
+- **Mode**: hybrid
+- **Merged into main**:
+  - `openspec/specs/game/spec.md` — restore from `/estado/`
+  - `openspec/specs/ui/spec.md` — modal, responsive, últimas
+  - `openspec/specs/config/spec.md` — sessionStorage seconds + cm
 
-## Specs synced to main
+## Chat behaviors locked
 
-| Domain | Path |
-|--------|------|
-| game | `openspec/specs/game/spec.md` |
-| ui | `openspec/specs/ui/spec.md` |
-| config | `openspec/specs/config/spec.md` |
-
-## Key behaviors locked in
-
-- Server-authoritative bingo 90; `/estado/` restore on home load
-- Modal overlay (cm diameter + proportional number); duration default 3s
-- sessionStorage-only config; `/configuracion` page
-- Responsive 3-column layout; logo aligned with BINGO; Últimas taller, newest first (up to 30)
+- Circular modal on ball (not static number above)
+- Config page: duration default 3s; size in cm (default 8, font 55%)
+- Config navigation does not reset bingo
+- Responsive 3-column; logo aligned with BINGO; Últimas taller, newest first (≤30)

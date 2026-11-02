@@ -57,3 +57,14 @@ Configuration values MUST be stored in `sessionStorage` keys managed by `static/
 ### Requirement: Shared client helpers
 
 Home and configuration pages MUST use the same `config-store.js` helpers so duration/size reads are consistent.
+
+### Requirement: Configuration does not reset game
+
+Opening `/configuracion` and returning to `/` MUST preserve server-side game state; only modal session preferences change.
+
+#### Scenario: Config round-trip
+
+- GIVEN balls already drawn on the server
+- WHEN the operator saves modal settings and returns home
+- THEN `/estado/` salidas MUST be unchanged by that navigation
+- AND home MUST restore those salidas into the UI
