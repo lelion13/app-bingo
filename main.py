@@ -31,8 +31,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# rutas estáticas y plantillas
-app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Estado del bingo
@@ -46,27 +44,19 @@ async def health():
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request}
-    )
+    # Starlette reciente: TemplateResponse(request, name, context=...)
+    return templates.TemplateResponse(request, "index.html")
 
 @app.get("/configuracion", response_class=HTMLResponse)
 @app.get("/configuracion/", response_class=HTMLResponse)
 async def configuracion(request: Request):
-    return templates.TemplateResponse(
-        "configuracion.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse(request, "configuracion.html")
 
 @app.get("/visor", response_class=HTMLResponse)
 @app.get("/visor/", response_class=HTMLResponse)
 async def visor(request: Request):
     """Pantalla solo-lectura para celular/tablet con números salidos."""
-    return templates.TemplateResponse(
-        "visor.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse(request, "visor.html")
 
 @app.get("/iniciar_bingo/")
 async def iniciar_bingo():
@@ -108,3 +98,6 @@ async def obtener_estado():
         "salidas": bolillas_salidas,
         "total": 90
     })
+
+# Mount estáticos al final para no interceptar rutas de la API/HTML
+app.mount("/static", StaticFiles(directory="static"), name="static")
